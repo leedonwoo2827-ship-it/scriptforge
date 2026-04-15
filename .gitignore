@@ -1,0 +1,21 @@
+# 생성물 (챕터별 대본 출력)
+output/
+
+# 원고 (저작권 콘텐츠 — 별도 권한 파일로 공유)
+sample/
+manuscripts/
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor
+.vscode/
+.idea/
+*.swp
+*~
+
+# Claude Code 로컬
+.claude/settings.local.json
+.claude/cache/

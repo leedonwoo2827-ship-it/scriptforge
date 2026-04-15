@@ -1,0 +1,19 @@
+{
+  "name": "scriptforge",
+  "version": "1.0.0",
+  "description": "도서 챕터 마크다운에서 영상 대본(씬 분할, 이미지 프롬프트, 내레이션, 영상 메타데이터)을 자동 생성하는 스킬 세트. StoryLens의 시리즈 가이드를 참조하여 일관된 스타일로 챕터별 대본을 생성하고, FlowGenie JSON + 마크다운 대본 + CSV로 출력한다. 하류 프로세스(FlowGenie, TTS, SceneWeaver)가 모두 소비할 수 있는 마스터 대본을 생산한다.",
+  "author": {
+    "name": "leedonwoo"
+  },
+  "repository": "https://github.com/leedonwoo2827-ship-it/scriptforge",
+  "license": "MIT",
+  "keywords": [
+    "scriptforge",
+    "video-script",
+    "flowgenie",
+    "scene-generation",
+    "image-prompt",
+    "narration",
+    "master-script"
+  ]
+}

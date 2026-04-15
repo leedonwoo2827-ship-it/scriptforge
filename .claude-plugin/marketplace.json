@@ -1,0 +1,21 @@
+{
+  "name": "scriptforge",
+  "owner": {
+    "name": "leedonwoo2827-ship-it",
+    "url": "https://github.com/leedonwoo2827-ship-it"
+  },
+  "metadata": {
+    "description": "도서 챕터 마크다운에서 영상 대본(씬 분할, 영문 이미지 프롬프트, 한국어 내레이션, 영상 메타데이터)을 자동 생성하는 스킬 세트. FlowGenie/TTS/SceneWeaver 모두가 소비할 수 있는 마스터 대본 JSON을 생산한다.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "scriptforge",
+      "source": "./",
+      "version": "1.0.0",
+      "description": "챕터 MD → 마스터 대본 JSON+MD+CSV. StoryLens-27의 시리즈 가이드를 참조하여 일관된 스타일로 챕터별 대본 생성.",
+      "category": "content-production",
+      "tags": ["scriptforge", "video-script", "flowgenie", "scene-generation", "image-prompt", "narration", "master-script"]
+    }
+  ]
+}
