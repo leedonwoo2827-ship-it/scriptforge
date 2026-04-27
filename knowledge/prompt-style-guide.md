@@ -114,16 +114,6 @@ Documentary style.                             ← 스타일 태그
 - 사용자와 SceneWeaver가 빠르게 참조할 수 있는 메모 역할
 - 예: "1950년대 교실 사진, 칠판에 수학 문제, 30명의 학생, 흑백"
 
-# [PATCH] scriptforge / knowledge / prompt-style-guide.md
-
-> **적용 방법:**
-> 1. https://github.com/leedonwoo2827-ship-it/scriptforge/blob/main/knowledge/prompt-style-guide.md 파일 열기
-> 2. 파일 **맨 끝**에 커서 두기 (마지막 줄 다음에 한 줄 띄우고)
-> 3. 아래 `─── BEGIN PATCH ───`부터 `─── END PATCH ───` 사이의 마크다운을 그대로 붙여넣기
-> 4. 커밋 메시지 권장: `docs(prompt-style-guide): 유명인 정책 차단 약화 가이드 추가`
-
----
-
 ## 유명인 정책 차단 — 약화 단계별 가이드
 
 Google Flow / Imagen / 기타 이미지 생성 모델은 실존 인물을 식별 가능한 단서 조합을 차단한다. 단순히 인물 이름만 빼는 것으로는 부족할 때가 많고, **국적·직업·시그니처 용어·시그니처 발명품** 4가지 단서 중 2개 이상이 결합되면 차단된다.
