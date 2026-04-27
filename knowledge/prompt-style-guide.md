@@ -113,3 +113,85 @@ Documentary style.                             ← 스타일 태그
 - prompt의 핵심 시각 요소를 1줄로 요약
 - 사용자와 SceneWeaver가 빠르게 참조할 수 있는 메모 역할
 - 예: "1950년대 교실 사진, 칠판에 수학 문제, 30명의 학생, 흑백"
+
+# [PATCH] scriptforge / knowledge / prompt-style-guide.md
+
+> **적용 방법:**
+> 1. https://github.com/leedonwoo2827-ship-it/scriptforge/blob/main/knowledge/prompt-style-guide.md 파일 열기
+> 2. 파일 **맨 끝**에 커서 두기 (마지막 줄 다음에 한 줄 띄우고)
+> 3. 아래 `─── BEGIN PATCH ───`부터 `─── END PATCH ───` 사이의 마크다운을 그대로 붙여넣기
+> 4. 커밋 메시지 권장: `docs(prompt-style-guide): 유명인 정책 차단 약화 가이드 추가`
+
+---
+
+## 유명인 정책 차단 — 약화 단계별 가이드
+
+Google Flow / Imagen / 기타 이미지 생성 모델은 실존 인물을 식별 가능한 단서 조합을 차단한다. 단순히 인물 이름만 빼는 것으로는 부족할 때가 많고, **국적·직업·시그니처 용어·시그니처 발명품** 4가지 단서 중 2개 이상이 결합되면 차단된다.
+
+### 차단 단서 4축
+
+| 축 | 예시 | 위험도 |
+|---|---|:-:|
+| **신원 단서** | South African, Irish, African-American mathematician | 높음 |
+| **직업 단서** | mathematician, physicist, behavioral psychologist | 중간 |
+| **시그니처 용어** | Constructionism, World Wide Web, Operant Conditioning, Walden Two | 매우 높음 |
+| **시그니처 발명품/장소** | turtle robot, NeXT computer at CERN, Skinner Box, Macintosh prototype | 매우 높음 |
+
+이 4축 중 **3개 이상이 한 프롬프트에 동시 등장하면 거의 확실히 차단**된다.
+
+### 약화 단계 (위에서 아래로 점진적)
+
+차단되면 다음 단계로 내려가며 재시도한다.
+
+| 단계 | 변경 | 예시 |
+|:-:|---|---|
+| **L0** | 인물 이름 직접 사용 | `Photo of Seymour Papert` (즉시 차단) |
+| **L1** | 인물 이름만 제거 | `South African mathematician` |
+| **L2** | 국적·인종 단서 제거 | `mathematician` |
+| **L3** | 시그니처 용어를 일반 어구로 | `Constructionism` → `Learning by Making` |
+| **L4** | 직업 단서 일반화 | `mathematician` → `thoughtful academic` |
+| **L5** | 기관명 일반화 | `MIT AI Lab` → `1960s university research office` |
+| **L6** | 발명품 명칭 우회 | `turtle robot` → `two-wheeled educational floor robot with a pen attachment` |
+| **L7** | 시대 명시 약화 | `1963` → `1960s` |
+
+> **경험칙:** 첫 시도는 L1부터 시작. 차단되면 한 번에 L3-L7까지 동시 적용해서 재시도하는 게 효율적. 한 단계씩 내리면 시간 낭비.
+
+### 사례 1: 시모어 페퍼트 (3장 18씬, 1963 MIT)
+
+**의도:** 페퍼트가 MIT AI 연구실에서 거북이 로봇으로 LOGO를 구상하는 part_intro 씬.
+
+| 시도 | 프롬프트 핵심 | 결과 |
+|:-:|---|:-:|
+| 1차 | `South African mathematician` + `Piaget developmental psychology books` + `MIT AI Lab` + `Constructionism` + `turtle robot` | ❌ 차단 |
+| 2차 | `thoughtful researcher` + `developmental psychology textbooks` + `MIT AI Lab` + `Constructionism` + `turtle robot` (L1-L2) | ❌ 차단 |
+| 3차 | `thoughtful academic` + `educational research books` + `1960s university research office` + `Learning by Making` + `two-wheeled educational floor robot with pen attachment` (L3-L7 동시) | ✅ 통과 |
+
+**교훈:** 시그니처 용어(Constructionism)와 시그니처 발명품(turtle robot)을 동시에 약화하지 않으면 통과하지 않는다. 둘 중 하나만 풀면 다른 하나가 트리거.
+
+### 의미 손실 방지 원칙
+
+이미지가 약해져도 영상 후처리 레이어에서 정확한 정보를 보충한다. 이미지는 **분위기**만 담당하고, 사실은 자막·내레이션·overlay가 담당하도록 역할 분담하면 시청자 경험상 손실 없다.
+
+| 정보 | 담당 레이어 |
+|---|---|
+| 인물 이름·정확 연도 | `scene_meta.text_overlay` |
+| 학자 인용·사상 설명 | `narration_text` (TTS 음성) |
+| 기관명·지명·부제 | `scene_meta.subtitle` (자막) |
+| 분위기·시대감·구도 | 이미지 프롬프트 |
+
+### 인물별 우회 패턴 사전 (시리즈 작업 중 누적)
+
+| 인물 | 차단 단서 | 통과 패턴 |
+|---|---|---|
+| 시모어 페퍼트 | South African + MIT AI Lab + Constructionism + turtle robot | thoughtful academic + 1960s university research office + Learning by Making + two-wheeled educational floor robot |
+| _(향후 추가)_ | _버너스 리, 잡스, 게이츠, 머스크, 올트먼 등은 작업 시 누적_ | |
+
+### 모델별 차이
+
+| 모델 | 정책 강도 | 비고 |
+|:-:|:-:|---|
+| Google Flow / Imagen | 강함 | 위 4축 동시 등장 시 차단 빈번 |
+| nano_banana | 중간 | 인물 묘사 약함 → 자연스러운 우회 가능 |
+| 기타 | 변동 | 모델 변경도 우회 옵션 중 하나 |
+
+차단이 풀리지 않으면 **모델을 바꾸는 것도 우회 옵션**이다. 시리즈 가이드의 `default_model`에 묶이지 말고 씬 단위로 override 검토.
