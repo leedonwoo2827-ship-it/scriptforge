@@ -96,6 +96,62 @@ CLAUDE.md에 정의된 마스터 대본 스키마를 따른다:
 
 UTF-8 BOM 인코딩으로 생성하여 Excel에서 바로 열 수 있게 한다.
 
+#### ① Excel 호환 — 반드시 UTF-8 BOM 포함
+
+한국어 Windows Excel은 CSV를 더블클릭으로 열 때 시스템 로케일(CP949)로 해석한다. **BOM이 없으면 한글이 깨진다.** 따라서 CSV는 **반드시** UTF-8 BOM(첫 3바이트 `EF BB BF`)으로 시작해야 한다.
+
+#### ✅ 올바른 생성
+
+**방법 A — Python (csv 모듈 사용 시):**
+
+```python
+import csv
+
+with open(f'output/ch{NN:02d}/ch{NN:02d}_script.csv',
+          'w', encoding='utf-8-sig', newline='') as f:
+    writer = csv.writer(f)
+    writer.writerow(['scene', 'type', 'title', ...])  # 헤더
+    for scene in scenes:
+        writer.writerow([...])
+```
+
+> 핵심: `encoding='utf-8-sig'` (BOM 자동 추가) + `newline=''` (Excel 호환 줄바꿈)
+
+**방법 B — Claude의 Write 도구로 직접 CSV 텍스트를 쓸 때:**
+
+CSV 콘텐츠의 **맨 첫 글자**로 보이지 않는 BOM 문자(`﻿`, U+FEFF)를 의도적으로 포함시킨다.
+
+```
+﻿scene,type,title,...
+1,opening_title,오프닝...
+```
+
+> Write 도구는 BOM을 자동으로 추가하지 않으므로 콘텐츠에 직접 포함해야 한다.
+
+#### ❌ 잘못된 생성 (Excel에서 한글 깨짐)
+
+```python
+# BOM 없는 일반 UTF-8 → 한국어 Windows Excel에서 한글 깨짐
+with open('ch{NN}_script.csv', 'w', encoding='utf-8', newline='') as f:
+    ...
+```
+
+#### ✅ 생성 후 필수 검증
+
+CSV 생성 직후 첫 3바이트가 `EF BB BF`인지 반드시 확인한다:
+
+```bash
+head -c 3 output/ch{NN}/ch{NN}_script.csv | xxd
+# 기대 출력:
+# 00000000: efbb bf
+```
+
+검증 실패 시 즉시 BOM 추가:
+
+```bash
+printf '\xef\xbb\xbf' | cat - ch{NN}_script.csv > tmp.csv && mv tmp.csv ch{NN}_script.csv
+```
+
 **컬럼:**
 
 | 컬럼 | 내용 |
@@ -113,6 +169,21 @@ UTF-8 BOM 인코딩으로 생성하여 Excel에서 바로 열 수 있게 한다.
 | transition | 전환 효과 |
 | subtitle | 자막 |
 | bgm_hint | BGM 힌트 |
+
+#### (옵션) XLSX 동시 생성
+
+사용자가 Excel을 자주 사용하는 워크플로우라면, CSV와 함께 XLSX도 생성한다 (`ch{NN}_script.xlsx`):
+
+- 헤더 행 강조 (배경 #305496, 흰 글씨, bold)
+- 첫 행 + 첫 두 컬럼(scene, type) 고정 (`freeze_panes='C2'`)
+- 자동 필터 활성화
+- 짝수 행 스트라이프 (#F2F2F2)
+- 한글 폰트: 맑은 고딕 (헤더 11pt bold, 본문 10pt)
+- 행 높이 헤더 32, 본문 110 (긴 프롬프트 텍스트 표시용)
+- 컬럼별 자동 너비 (narration_text 60, prompt 80, visual_description 40, 등)
+- `wrap_text=True, vertical='top'` 일괄 적용
+
+XLSX는 인코딩 문제가 본질적으로 없으므로 BOM과 무관하게 안전하다.
 
 ### Step 5: 매니페스트 업데이트
 
